@@ -1,0 +1,80 @@
+<html>
+
+<head>
+</head>
+
+<body>
+
+
+	<h1 id="hotdogoutput"> Hot dog status:</h1>
+	<input type="textfield" id="latesthotdogstatus"/>
+	<button id="saveButton">Save</button>
+	<button id="loadButton">Load</button>
+	
+
+<script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-firestore.js"></script>
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyBF3rldkm7ug7AnBBwz2t2CVMj40bAurZA",
+    authDomain: "cards-27b9b.firebaseapp.com",
+    databaseURL: "https://cards-27b9b.firebaseio.com",
+    projectId: "cards-27b9b",
+    storageBucket: "cards-27b9b.appspot.com",
+    messagingSenderId: "954742543466",
+    appId: "1:954742543466:web:e050a4d5208e41027ba613",
+    measurementId: "G-60LQ5XJNBL"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  firebase.analytics();
+  var firestore = firebase.firestore();
+  
+  const docRef = firestore.doc("samples/sandwichData");
+  
+  const outputHeader = document.querySelector("#hotdogoutput");
+  const inputTextField = document.querySelector("#latesthotdogstatus");
+  const saveButton = document.querySelector("#saveButton");
+  const loadButton = document.querySelector("#loadButton");
+  
+  saveButton.addEventListener("click", function() {
+		const textToSave = inputTextField.value;
+		console.log("saving " + textToSave );
+		docRef.set({
+			hotDogStatus: textToSave
+		}).then(function(){
+			console.log("status saved");
+		}).catch(function (error) {
+			console.log("got an error:", error);
+		});
+	})
+  
+  loadButton.addEventListener("click", function() {
+		console.log("loadbutton");
+		docRef.get().then( function (doc) {
+			if(doc && doc.exists) {
+				const myData = doc.data();
+				outputHeader.innerText = "Status:" + myData.hotDogStatus;
+			}
+		}).catch(function (error) {
+			console.log("got an error:", error);
+		});
+	});
+	
+	getRealtimeUpdates = function () {
+		docRef.onSnapshot(function (doc) {
+			if(doc && doc.exists) {
+				const myData = doc.data();
+				outputHeader.innerText = "Status:" + myData.hotDogStatus;
+			}
+		});
+	}
+	
+	getRealtimeUpdates();
+
+</script>	
+</body>
+
+</html>
