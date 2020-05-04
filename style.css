@@ -40,4 +40,14 @@ h1 {
 	-o-border-radius:8px;
 	box-shadow:#111 1px 1px 2px;
 }
+#msg-box {
+	padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 4px;  
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+  //display: none;
+}
 a:visited {color:blue;}

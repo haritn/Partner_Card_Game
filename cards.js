@@ -13,8 +13,6 @@ var cards = (function () {
   };
   var zIndexCounter = 1;
   var all = []; //All the cards created.
-  var SUITS = ['&spades;', '&hearts;', '&clubs;', '&diams;', 'R'];
-  var CARDS = [2, 3, 4, 5, 6, 7, 8, 9, '0', 'J', 'Q', 'K', 'A'];
 
   function mouseEvent(ev) {
     var card = $(this).data('card');
@@ -40,12 +38,11 @@ var cards = (function () {
     if ($(opt.table).css('position') == 'static') {
       $(opt.table).css('position', 'relative');
     }
-
     for (var i = start; i <= end; i++) {
-      all.push(new Card('&hearts;', i, opt.table));
-      all.push(new Card('&spades;', i, opt.table));
-      all.push(new Card('&diams;', i, opt.table));
-      all.push(new Card('&clubs;', i, opt.table));
+      all.push(new Card('h', i, opt.table));
+      all.push(new Card('s', i, opt.table));
+      all.push(new Card('d', i, opt.table));
+      all.push(new Card('c', i, opt.table));
     }
     if (opt.blackJoker) {
       all.push(new Card('bj', 0, opt.table));
@@ -189,7 +186,16 @@ var cards = (function () {
     mouseup: function (func, context) {
       this._mouseup = { func: func, context: context };
     },
-
+    sortCards: function () {
+      var compare = function (a, b) {
+        if (a.suit < b.suit) return -1;
+        if (a.suit > b.suit) return 1;
+        if (a.rank < b.rank) return -1;
+        if (a.rank > b.rank) return 1;
+        return 0;
+      };
+      this.sort(compare);
+    },
     render: function (options) {
       options = options || {};
       var speed = options.speed || opt.animationSpeed;
@@ -210,7 +216,9 @@ var cards = (function () {
         }
       }
       var me = this;
+      //this flip is just part of animation. doesn't really flip anything.
       var flip = function () {
+        //console.log('fliping:' + me);
         for (var i = 0; i < me.length; i++) {
           if (me.faceUp) {
             me[i].showCard();

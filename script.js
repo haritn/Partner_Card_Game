@@ -41,89 +41,86 @@ Psudo code
 	
 
 */
-numberOfPlayers = 3;
-cardsToDeal = Math.floor(52 / numberOfPlayers);
-cardsToRemove = 52 % numberOfPlayers;
-myPlayerNumber = 1;
-//Tell the library which element to use for the table
-//cards.init({table:'#card-table'});
-cards.init();
-
-//Create a new deck of cards
-deck = new cards.Deck();
-
-//By default it's in the middle of the container, put it slightly to the side
-deck.x -= 50;
-deck.y += 100
-
-//cards.all contains all cards, put them all in the deck
-deck.addCards(cards.all);
-//deck.removeCard(deck[0])
-//No animation here, just get the deck onto the table.
-deck.render({ immediate: true });
-
-//Now lets create a couple of hands, one face down, one face up.
-
-hands = [];
-
-for (i = 0; i < numberOfPlayers; i++) {
-  hands[i] = new cards.Hand({ faceUp: true, x: deck.x - 50, y: i * 100 });
-}
-
-//Lets add a discard pile
-discardPile = new cards.Deck({ faceUp: true });
-discardPile.x += 180;
-
+numberOfPlayers = 5;
+console.log('players:' + numberOfPlayers);
+cardsInHand = Math.floor(52 / numberOfPlayers);
+hands =[];
+currentTrick = new cards.Hand({faceUp:true, x:100});
+currentPlayerIndex = 0;
+currentPlayerHand = hands[currentPlayerIndex];
+playGame();
 
 //Let's deal when the Deal button is pressed:
 $('#deal').click(function () {
   //Deck has a built in method to deal to hands.
+  numberOfPlayers = $('#players').val();
+  cardsInHand = Math.floor(52 / numberOfPlayers);
+  cards.init({ table: '#card-table' });
+  deck = initializeDeck();
+  console.log('deck size:' + deck.length)
+  hands = initializeHands();
   $('#deal').hide();
-  deck.deal(cardsToDeal, hands, 5, function () {
-    //This is a callback function, called when the dealing
-    //is done.
-    //		discardPile.addCard(deck.topCard());
-    discardPile.render();
-  });
+  deck.deal(cardsInHand, hands, 1, function(){sortAllHands();});
+  displayMessage("player# 1 your turn");
+  
 });
 
-$('#sort').click(function () {
-  hands[0].sort(cardCompare);
-  console.log(hands[0]);
-  hands[0].render();
-});
 
-function cardCompare(a, b) {
-  if (a.suit < b.suit) return -1;
-  if (a.suit > b.suit) return 1;
-  if (a.rank < b.rank) return -1;
-  if (a.rank > b.rank) return 1;
-  return 0;
+function sortAllHands(){
+    for (i = 0; i < numberOfPlayers; i++){
+      hands[i].sortCards();
+      hands[i].render();
+  }
 }
-/*
-//When you click on the top card of a deck, a card is added
-//to your hand
-deck.click(function(card){
-	if (card === deck.topCard()) {
-		lowerhand.addCard(deck.topCard());
-		lowerhand.render();
-	}
-});
 
-//Finally, when you click a card in your hand, if it's
-//the same suit or rank as the top card of the discard pile
-//then it's added to it
-lowerhand.click(function(card){
-	if (card.suit == discardPile.topCard().suit 
-		|| card.rank == discardPile.topCard().rank) {
-		discardPile.addCard(card);
-		discardPile.render();
-		lowerhand.render();
-	}
-}); */
+function initializeDeck() {
+  var cardsToRemove = 52 % numberOfPlayers;
+  //Tell the library which element to use for the table
+  //Create a new deck of cards
 
+  var deck = new cards.Deck();
+  deck.x = 900;
+  deck.y = 100
+  //cards.all contains all cards, discard last X 
+  deck.addCards(cards.all);  
+  //discard extra cards 
+  while(cardsToRemove--){
+    discardPile = new cards.Deck({faceUp:false});
+    $(deck.bottomCard().el).hide();
+    discardPile.addCard(deck.bottomCard());
+  }
+  cards.shuffle(deck);
+  deck.render({ immediate: true});
+  return deck;
+}
 
-//So, that should give you some idea about how to render a card game.
-//Now you just need to write some logic around who can play when etc...
-//Good luck :)
+function initializeHands() {
+  var hands = [];
+  for (i = 0; i < numberOfPlayers; i++) {
+    // hands[i] = new cards.Hand({ faceUp: i == myPlayerNumber, y: i * 100 + 100 });
+    hands[i] = new cards.Hand({ faceUp: true, y: i * 100 + 100 });
+    hands[i].click(handClicked);
+  }
+  return hands;
+}
+
+function playGame(){
+
+}
+
+function handClicked(card){
+  card.container 
+  if(card.container == currentPlayerHand){
+    displayMessage('bingo')
+  }
+	currentTrick.addCard(card);
+	currentTrick.render();    
+	// }
+}
+
+function displayMessage(msg){
+    console.log("message:" + msg)
+    $( "#msg-box" ).html(msg);
+}
+
 
