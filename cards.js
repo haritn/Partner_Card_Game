@@ -9,7 +9,7 @@ var cards = (function () {
     acesHigh: true,
     cardsUrl: 'img/cards.png',
     blackJoker: false,
-    redJoker: false
+    redJoker: false,
   };
   var zIndexCounter = 1;
   var all = []; //All the cards created.
@@ -173,6 +173,7 @@ var cards = (function () {
       this.x = options.x || $(opt.table).width() / 2;
       this.y = options.y || $(opt.table).height() / 2;
       this.faceUp = options.faceUp;
+      this.player = options.player;
     },
 
     click: function (func, context) {
