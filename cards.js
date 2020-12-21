@@ -79,6 +79,7 @@ var cards = (function () {
       this.rank = rank;
       this.name = suit.toUpperCase() + rank;
       this.faceUp = false;
+      this.player = null;
       this.el = $('<div/>').css({
         width: opt.cardSize.width,
         height: opt.cardSize.height,
@@ -155,6 +156,7 @@ var cards = (function () {
         }
         this.push(card);
         card.container = this;
+        if(this.player)card.player = this.player; //add player to a card only if its defined.
       }
     },
 
@@ -217,7 +219,7 @@ var cards = (function () {
         }
       }
       var me = this;
-      //this flip is just part of animation. doesn't really flip anything.
+/*      //this flip is just part of animation. doesn't really flip anything.
       var flip = function () {
         //console.log('fliping:' + me);
         for (var i = 0; i < me.length; i++) {
@@ -233,6 +235,7 @@ var cards = (function () {
       } else {
         setTimeout(flip, speed / 2);
       }
+*/
 
       if (options.callback) {
         setTimeout(options.callback, speed);
@@ -245,6 +248,12 @@ var cards = (function () {
 
     bottomCard: function () {
       return this[0];
+    },
+
+    hasSuit: function(suit){
+      return this.some(function(value, index, array){
+        return value.suit == suit;
+      });
     },
 
     toString: function () {

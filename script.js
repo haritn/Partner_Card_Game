@@ -42,7 +42,6 @@ Psudo code
 
 */
 players = "Harit,Yash,Anand,Jatin,Bhaven".split(',');
-console.log(players);
 numberOfPlayers = players.length;
 cardsInHand = Math.floor(52 / numberOfPlayers);
 hands =[];
@@ -51,6 +50,7 @@ currentPlayerIndex = 0;
 currentPlayerHand = null;
 playGame();
 
+$('#names').html(players.join(', '));
 //Let's deal when the Deal button is pressed:
 $('#deal').click(function () {
   //Deck has a built in method to deal to hands.
@@ -99,9 +99,12 @@ function initializeHands() {
   var hands = [];
   for (i = 0; i < numberOfPlayers; i++) {
     // hands[i] = new cards.Hand({ faceUp: i == myPlayerNumber, y: i * 100 + 100 });
-    hands[i] = new cards.Hand({ faceUp: true, y: i * 100 + 100, player:i});
+    hands[i] = new cards.Hand({ faceUp: true, y: i * 100 + 100});
+    hands[i].player = i +'';
     hands[i].click(handClicked);
   }
+  console.log('hands');
+  console.log(hands);
   return hands;
 }
 
@@ -111,20 +114,24 @@ function playGame(){
 
 function handClicked(card){
   currentHand = hands[currentPlayerIndex];
-  if(card.container.player == currentHand.player){ //only the player with their turn can play
-    if( !currentTrick.topCard() ||  //if current trick is empty or 
-        card.suit == currentTrick.topCard().suit){ //current played card matches the suit of the trick.
-        //TODO: or player doesn't have any card from the same suit.        
+  bottomCard = currentTrick.bottomCard();
+  console.log(bottomCard);
+
+  if(card.container.player == currentPlayerIndex){ //only the player with their turn can play
+    if( !currentTrick.bottomCard() ||  //if current trick is empty or 
+        card.suit == bottomCard.suit || //current played card matches the suit of the trick.
+        !currentHand.hasSuit(bottomCard.suit)){ //or player doesn't have any card from the same suit.        
         currentTrick.addCard(card);
         currentTrick.render();
         currentPlayerIndex ++;
         if(currentPlayerIndex >= numberOfPlayers){
           closeCurrentTrick(); //decide winner, move the pile next to player, count points.
           startNewTrick(); //set current index to winner.
-        }
-        displayMessage('Player '+ (currentPlayerIndex +1)+ ' your turn')      
+        } else {
+          displayMessage('Player '+ (currentPlayerIndex +1)+ ' your turn')      
+        }    
     } else {
-      displayMessage('Please pick same Suit')
+      displayMessage('Please pick card from Suit' + bottomCard.suit)
     }
 
   } else {
@@ -136,12 +143,17 @@ function handClicked(card){
 
 function closeCurrentTrick() {
   //TODO
-  var winner = currentTrick[0]; //take the firxt card in the trick
-  var trickSuit = winner.suit; //first card sets the trick suit
+  console.log("close current trick()");
+  var winningCard = currentTrick.bottomCard(); //take the first card in the trick
+  console.log(currentTrick);
+  console.log(hands[0]);
+  var trickSuit = winningCard.suit; //first card sets the trick suit
   for (card of currentTrick){ 
-    if (card.suit = trickSuit && card.rank > winner.rank) winner = card; //higher card.    
+    if (card.suit == trickSuit && card.rank > winningCard.rank) winningCard = card; //higher card.    
   }
-  return winner;
+  displayMessage('Trick winner is player # ' + (winningCard.player) + ' ' + players[winningCard.player]);
+  console.log(winningCard.player);
+  return winningCard.player;
 }
 
 function startNewTrick(){
